@@ -12,13 +12,18 @@ async function getMapJson(technicalName) {
 
 function msDrawMapBackground(mapJson) {
   if (!msCtx || !mapJson) return;
+
+  msCtx.save();
+  msCtx.translate(0, 2320);
+  msCtx.scale(1, -1);
+
   for (const area of (mapJson.areas ?? [])) {
     const pts = area.polygon?.points;
     if (!pts?.length) continue;
     msCtx.beginPath();
-    msCtx.moveTo((pts[0].x + 150) * 10, (-pts[0].y + 116) * 10);
+    msCtx.moveTo((pts[0].x + 150) * 10, (pts[0].y + 116) * 10);
     for (let i = 1; i < pts.length; i++) {
-      msCtx.lineTo((pts[i].x + 150) * 10, (-pts[i].y + 116) * 10);
+      msCtx.lineTo((pts[i].x + 150) * 10, (pts[i].y + 116) * 10);
     }
     msCtx.closePath();
     msCtx.fillStyle = area.type === 1 ? 'rgba(80,140,200,0.35)'
@@ -34,12 +39,14 @@ function msDrawMapBackground(mapJson) {
     msCtx.lineWidth = 80;
     msCtx.lineCap = 'round';
     msCtx.lineJoin = 'round';
-    msCtx.moveTo((pts[0].point.x + 150) * 10, (-pts[0].point.y + 116) * 10);
+    msCtx.moveTo((pts[0].point.x + 150) * 10, (pts[0].point.y + 116) * 10);
     for (let i = 1; i < pts.length; i++) {
-      msCtx.lineTo((pts[i].point.x + 150) * 10, (-pts[i].point.y + 116) * 10);
+      msCtx.lineTo((pts[i].point.x + 150) * 10, (pts[i].point.y + 116) * 10);
     }
     msCtx.stroke();
   }
+
+  msCtx.restore();
 }
 
 const MS_PI2 = Math.PI * 2;
@@ -60,7 +67,7 @@ function msTowerFootprint(t) {
   }
 }
 
-function msToCanvas(t) { return { x:(t.position.x+150)*10, y:(-t.position.y+116)*10 }; }
+function msToCanvas(t) { return { x:(t.position.x+150)*10, y:(t.position.y+116)*10 }; }
 
 function msIsRect(t) { return t.baseId==='MonkeyAce'||t.baseId==='BananaFarm'||t.baseId==='HeliPilot'; }
 
@@ -157,6 +164,10 @@ function msDrawCanvas() {
   const towers = (profile.savedMaps?.[msSelectedMap]?.placedTowers ?? [])
     .filter(t => t.parentTowerId === 4294967295);
 
+  msCtx.save();
+  msCtx.translate(0, 2320);
+  msCtx.scale(1, -1);
+
   msCtx.fillStyle  = '#00ff00';
   msCtx.globalAlpha = 0.5;
   msCtx.font = '48px serif';
@@ -188,6 +199,8 @@ function msDrawCanvas() {
     msCtx.stroke(); msCtx.fill();
   }
 
+  msCtx.restore();
+
   msCtx.globalAlpha = 1;
   msCtx.fillStyle  = '#ffffff';
   msCtx.strokeStyle = 'black';
@@ -195,7 +208,6 @@ function msDrawCanvas() {
   msCtx.font = '48px serif';
   msCtx.textBaseline = 'middle';
   msCtx.textAlign = 'center';
-  msCtx.beginPath();
   for (const t of towers) {
     if (t.parentTowerId !== 4294967295) continue;
     const {x,y} = msToCanvas(t);
@@ -204,7 +216,6 @@ function msDrawCanvas() {
     msCtx.fillStyle = 'white';
     msCtx.fillText(label,x,y);
   }
-  msCtx.stroke(); msCtx.fill();
 }
 
 function msShowTowerInfo(t) {
@@ -283,14 +294,14 @@ function msCanvasThing(event) {
   const rect = msCanvas.getBoundingClientRect();
   const clickX = event.clientX - rect.left;
   const clickY = event.clientY - rect.top;
-  const gameX =  (((3000 / rect.width)  * clickX) / 10) - 150;
-  const gameY = -(((2320 / rect.height) * clickY) / 10) + 116;
+  const gameX = (((3000 / rect.width)  * clickX) / 10) - 150;
+  const gameY = (((2320 / rect.height) * clickY) / 10) - 116;
 
   const towers = (profile.savedMaps?.[msSelectedMap]?.placedTowers??[])
     .filter(t => t.parentTowerId === 4294967295);
 
-  const cx = ( gameX + 150) * 10;
-  const cy = (-gameY + 116) * 10;
+  const cx = (gameX + 150) * 10;
+  const cy = (gameY + 116) * 10;
 
   let best=null, bestDist=Infinity;
   for (const t of towers) {
