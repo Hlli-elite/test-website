@@ -42,6 +42,14 @@ function msDrawMapBackground(mapJson) {
   }
 }
 
+async function msRefreshCanvas() {
+  if (!msCtx || !msSelectedMap) return;
+  msCtx.clearRect(0, 0, 3000, 2320);
+  const mapJson = await getMapJson(msSelectedMap);
+  msDrawMapBackground(mapJson);
+  msDrawCanvas();
+}
+
 const MS_PI2 = Math.PI * 2;
 let msCtx = null, msCanvas = null;
 let msSelectedMap = null, msSelectedTower = null;
@@ -263,17 +271,29 @@ function msShowTowerInfo(t) {
   const upg1 = msStatMaker(upgDiv,'upgrade','Path 1:',t.pathOneTier);
   const upg2 = msStatMaker(upgDiv,'upgrade','Path 2:',t.pathTwoTier);
   const upg3 = msStatMaker(upgDiv,'upgrade','Path 3:',t.pathThreeTier);
-  upg1.addEventListener('blur',()=>{t.pathOneTier=parseInt(upg1.textContent)||0; msDrawCanvas();});
-  upg2.addEventListener('blur',()=>{t.pathTwoTier=parseInt(upg2.textContent)||0; msDrawCanvas();});
-  upg3.addEventListener('blur',()=>{t.pathThreeTier=parseInt(upg3.textContent)||0; msDrawCanvas();});
+  upg1.addEventListener('blur',()=>{t.pathOneTier=parseInt(upg1.textContent)||0; msRefreshCanvas();});
+  upg2.addEventListener('blur',()=>{t.pathTwoTier=parseInt(upg2.textContent)||0; msRefreshCanvas();});
+  upg3.addEventListener('blur',()=>{t.pathThreeTier=parseInt(upg3.textContent)||0; msRefreshCanvas();});
   towerInfo.appendChild(upgDiv);
 
   const posX = msStatMaker(towerInfo,'pos-x','Position X:',t.position?.x);
   const posY = msStatMaker(towerInfo,'pos-y','Position Y:',t.position?.y);
   const posZ = msStatMaker(towerInfo,'pos-z','Position Z:',t.position?.z);
-  posX.addEventListener('blur',()=>{if(t.position)t.position.x=parseFloat(posX.textContent)||0; msDrawCanvas();});
-  posY.addEventListener('blur',()=>{if(t.position)t.position.y=parseFloat(posY.textContent)||0; msDrawCanvas();});
-  posZ.addEventListener('blur',()=>{if(t.position)t.position.z=parseFloat(posZ.textContent)||0;});
+  posX.addEventListener('blur', () => {
+    if (t.position) {
+      t.position.x = parseFloat(posX.textContent) || 0;
+      msRefreshCanvas();
+    }
+  });
+  posY.addEventListener('blur', () => {
+    if (t.position) {
+      t.position.y = parseFloat(posY.textContent) || 0;
+      msRefreshCanvas();
+    }
+  });
+  posZ.addEventListener('blur', () => {
+    if (t.position) t.position.z = parseFloat(posZ.textContent) || 0;
+  });
 
   const worth = msStatMaker(towerInfo,'worth','Tower Value: $',t.worth);
   worth.addEventListener('blur',()=>{t.worth=parseInt(worth.textContent)||0;});
@@ -317,10 +337,10 @@ function msCanvasThing(event) {
     leftMenu.style.display  = 'none';
     rightMenu.style.display = 'none';
     msSelectedTower = null;
-    msDrawCanvas();
+    msRefreshCanvas();
   } else {
     msSelectedTower = best;
-    msDrawCanvas();
+    msRefreshCanvas();
     msShowTowerInfo(best);
   }
 }
@@ -386,8 +406,5 @@ async function msSelectMap(mapKey) {
 
   if (msMVOpen) msMapVariablesFiller(document.getElementById('msMapVariables'), mapKey);
 
-  msCtx.clearRect(0, 0, 3000, 2320);
-  const mapJson = await getMapJson(mapKey);
-  msDrawMapBackground(mapJson);
-  msDrawCanvas();
+  msRefreshCanvas();
 }
