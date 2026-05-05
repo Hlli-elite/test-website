@@ -1,0 +1,16 @@
+const POWERS = [
+  { key: 'BananaFarmer',    name: 'Banana Farmer' },
+  { key: 'CamoTrap',        name: 'Camo Trap' },
+  { key: 'CashDrop',        name: 'Cash Drop' },
+  { key: 'DartTime',        name: 'Time Stop' },
+  { key: 'EnergisingTotem', name: 'Energising Totem' },
+  { key: 'GlueTrap',        name: 'Glue Trap' },
+  { key: 'MoabMine',        name: 'MOAB Mine' },
+  { key: 'MonkeyBoost',     name: 'Monkey Boost' },
+  { key: 'Pontoon',         name: 'Pontoon' },
+  { key: 'PortableLake',    name: 'Portable Lake' },
+  { key: 'RoadSpikes',      name: 'Road Spikes' },
+  { key: 'SuperMonkeyStorm',name: 'Super Monkey Storm' },
+  { key: 'TechBot',         name: 'Tech Bot' },
+  { key: 'Thrive',          name: 'Thrive' },
+];
