@@ -185,3 +185,200 @@
       <button class="btn btn-sm" onclick="filterMaps('Intermediate',this)">Intermediate</button>
       <button class="btn btn-sm" onclick="filterMaps('Advanced',this)">Advanced</button>
       <button class="btn btn-sm" onclick="filterMaps('Expert',this)">Expert</button>
+      <button class="btn btn-sm" onclick="mapsMaxAll()">Max All (Black Border)</button>
+    </div>
+    <table class="map-table" id="mapsTable">
+      <thead>
+        <tr>
+          <th>Map</th>
+          <th class="medal-col">Easy</th>
+          <th class="medal-col">Primary</th>
+          <th class="medal-col">Deflation</th>
+          <th class="medal-col">Medium</th>
+          <th class="medal-col">Military</th>
+          <th class="medal-col">Apopalypse</th>
+          <th class="medal-col">Reverse</th>
+          <th class="medal-col">Hard</th>
+          <th class="medal-col">Magic</th>
+          <th class="medal-col">2xHP</th>
+          <th class="medal-col">½Cash</th>
+          <th class="medal-col">ABR</th>
+          <th class="medal-col">Impop</th>
+          <th class="medal-col">CHIMPS</th>
+        </tr>
+      </thead>
+      <tbody id="mapsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ══ TAB: Unlockables ════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-unlocks">
+    <h2>Unlockables &amp; IAP</h2>
+    <div class="warn">⚠ These flags simulate purchases. Use at your own risk — some may require a server-side validation that this editor cannot bypass (e.g. Monkey Knowledge unlock).</div>
+    <p style="margin-bottom:10px;font-size:12px;color:#888;">Blue border = affects <code>purchase.purchasedOneTimeItems</code> array (IAP items). Green border = already active.</p>
+    <div class="unlock-grid" id="unlockGrid"></div>
+  </div>
+
+  <!-- ══ TAB: Rogue Artifacts ═══════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-artifacts">
+    <h2>Rogue Legends — Artifacts</h2>
+    <div class="warn">⚠ Edits apply to <strong>legendsData.rogueSaves.MainSave</strong> only. The save must have an active Rogue save for this to work.</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
+      <span id="artifactCount" style="font-size:12px;color:#888;"></span>
+      <button class="btn" onclick="artifactMaxLimit()">Raise Limit to 9999</button>
+      <button class="btn" onclick="artifactClearAll()">Clear All Artifacts</button>
+    </div>
+    <div style="margin-bottom:14px;">
+      <h3 style="font-size:13px;color:#ffe082;margin-bottom:8px;">🪙 Tokens (unlimited, do not count toward artifact limit)</h3>
+      <div id="tokenSection" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+    </div>
+    <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;" id="artifactFilters">
+      <button class="btn btn-sm art-filter active" data-f="all">All</button>
+      <button class="btn btn-sm art-filter" data-f="Primary" style="color:#f4b942">Primary</button>
+      <button class="btn btn-sm art-filter" data-f="Military" style="color:#4fc3f7">Military</button>
+      <button class="btn btn-sm art-filter" data-f="Magic" style="color:#ce93d8">Magic</button>
+      <button class="btn btn-sm art-filter" data-f="Support" style="color:#a5d6a7">Support</button>
+      <button class="btn btn-sm art-filter" data-f="AllMonkeyTowerSets">General</button>
+      <button class="btn btn-sm art-filter" data-f="boss" style="color:#ef9a9a">Boss</button>
+    </div>
+    <div class="artifact-grid" id="artifactGrid"></div>
+  </div>
+
+  <!-- ══ TAB: Rogue Stats ════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-roguestats">
+    <h2>Rogue Legends — Stats &amp; XP Shop</h2>
+    <div class="warn">⚠ Edits apply to <strong>legendsData.rogueSaves.MainSave</strong> and <strong>legendsData</strong>. Requires an active Rogue save.</div>
+
+    <h3 style="margin:12px 0 8px;font-size:13px;color:#9cdcfe;">Run Stats</h3>
+    <div class="grid-2" id="rogueStatsGrid"></div>
+
+    <h3 style="margin:14px 0 8px;font-size:13px;color:#9cdcfe;">Legend XP &amp; Global</h3>
+    <div class="grid-2" id="rogueLegendGrid"></div>
+
+    <h3 style="margin:14px 0 8px;font-size:13px;color:#ce93d8;">XP Shop — Unlocked Levels
+      <span style="font-size:11px;color:#555;font-weight:normal;margin-left:8px;">(legendsData.unlockedRogueXpShopItems)</span>
+    </h3>
+    <div class="warn" style="margin-bottom:8px;">These are the <em>unlocked</em> levels bought with Legend XP. The values shown are the max unlockable per item as seen in the example save.</div>
+    <div class="grid-2" id="rogueXpShopGrid"></div>
+
+    <h3 style="margin:14px 0 8px;font-size:13px;color:#ce93d8;">XP Shop — Applied to Current Run
+      <span style="font-size:11px;color:#555;font-weight:normal;margin-left:8px;">(rogueSaves.MainSave.appliedRogueXpShopItems)</span>
+    </h3>
+    <div class="grid-2" id="rogueAppliedShopGrid"></div>
+  </div>
+
+  <!-- ══ TAB: Frontier ══════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-frontier">
+    <h2>Frontier Legends — Save Editor</h2>
+    <div class="warn">⚠ Edits apply to <strong>legendsData.frontierSaves.MainSave</strong>. Requires an active Frontier save.</div>
+
+    <h3 style="margin:12px 0 8px;font-size:13px;color:#a5d6a7;">Currency &amp; Resources</h3>
+    <div class="grid-2" id="frontierCurrencyGrid"></div>
+
+    <h3 style="margin:14px 0 8px;font-size:13px;color:#a5d6a7;">Sheriff</h3>
+    <div class="grid-2" id="frontierSheriffGrid"></div>
+
+    <h3 style="margin:14px 0 8px;font-size:13px;color:#a5d6a7;">Powers (Health &amp; Stamina Potions)</h3>
+    <div class="grid-2" id="frontierPowersGrid"></div>
+
+    <h3 style="margin:14px 0 8px;font-size:13px;color:#a5d6a7;">Flags</h3>
+    <div id="frontierFlagsGrid" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+
+  <!-- ══ TAB: Trophy Store ═══════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-trophystore">
+    <h2>Trophy Store Items</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:8px;">Items are stored in <code>trophyStoreItems</code> as an array of strings. Checking an item adds it to that array. This does <strong>not</strong> set any active/equipped state — just unlocks ownership.</p>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <span id="trophyCount" style="font-size:12px;color:#888;"></span>
+      <button class="btn" onclick="trophySelectAll()">Select All</button>
+      <button class="btn" onclick="trophydeselectAll()">Clear All</button>
+      <input id="trophySearch" type="text" placeholder="Search items..." style="background:#2a2a2a;border:1px solid #444;border-radius:4px;color:#d4d4d4;font-size:12px;padding:4px 8px;width:180px;" oninput="filterTrophyCards()">
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;" id="trophyFilters">
+      <button class="btn btn-sm trophy-filter active" data-f="all">All</button>
+      <button class="btn btn-sm trophy-filter" data-f="Bloons" style="color:#ef9a9a">Bloons</button>
+      <button class="btn btn-sm trophy-filter" data-f="Coop" style="color:#80cbc4">Co-op</button>
+      <button class="btn btn-sm trophy-filter" data-f="GameUI" style="color:#fff59d">Game UI</button>
+      <button class="btn btn-sm trophy-filter" data-f="Heroes" style="color:#ce93d8">Heroes</button>
+      <button class="btn btn-sm trophy-filter" data-f="Monkeys" style="color:#a5d6a7">Monkeys</button>
+    </div>
+    <div class="artifact-grid" id="trophyGrid"></div>
+  </div>
+
+  <!-- ══ TAB: Map Saves ═════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-mapsaves">
+    <h2>Map Saves</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:8px;">Click a map in the list to load it. Click a tower on the canvas to edit it. Use <strong>Map Variables</strong> to edit cash, lives, round etc.</p>
+
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
+      <span id="msMapName" style="font-size:14px;color:#f0c040;font-weight:bold;min-width:80px;"></span>
+      <span id="msTowerCount" style="font-size:11px;color:#555;"></span>
+      <button class="btn" onclick="msToggleMapVars()" style="font-size:11px;padding:4px 10px;">Map Variables</button>
+    </div>
+
+    <div style="display:flex;gap:10px;height:660px;">
+      <div id="msSaveList" style="width:180px;flex-shrink:0;overflow-y:auto;background:#1a1a1a;border:1px solid #333;border-radius:4px;padding:4px;"></div>
+
+      <div style="flex:1;min-width:0;position:relative;overflow:hidden;border:1px solid #333;border-radius:4px;background:#111;">
+        <div style="overflow:auto;width:100%;height:100%;">
+          <canvas id="msCanvas" style="display:block;cursor:crosshair;width:100%;height:auto;"></canvas>
+        </div>
+        <div id="msInfoLeft"  class="ms-info-panel" style="display:none;left:0;"></div>
+        <div id="msInfoRight" class="ms-info-panel" style="display:none;right:0;"></div>
+        <div id="msMapVariables" class="ms-mv-panel" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: Profile Stats ══════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-profilestats">
+    <h2>Profile Stats</h2>
+    <p style="font-size:12px;color:#888;margin-bottom:12px;">These are the stats shown in-game on the Profile Stats screen. Fields map to exact JSON paths in the save file.</p>
+    <div id="psGrid"></div>
+  </div>
+
+  <!-- ══ TAB: Raw JSON ════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-raw">
+    <h2>Decrypted JSON</h2>
+    <p style="margin-bottom:8px;">Read-only reference. Use Ctrl+F to find keys to add to the editor.</p>
+    <button id="togglePreview" onclick="togglePreview()">▶ Show raw JSON</button>
+    <pre id="jsonPreview"></pre>
+  </div>
+
+  <!-- ── Actions ──────────────────────────────────────────────── -->
+  <div class="actions">
+    <button class="btn btn-json" onclick="downloadJSON()">⬇ Download Edited JSON</button>
+    <button class="btn btn-save" onclick="downloadSave()">⬇ Download Re-encrypted .Save</button>
+    <button class="btn btn-reset" onclick="reset()">✕ Reset</button>
+  </div>
+
+</div><!-- /editor -->
+
+<script src="version.js"></script>
+<script src="js/data/powers.js"></script>
+<script src="js/data/towers.js"></script>
+<script src="js/data/maps.js"></script>
+<script src="js/data/achievements.js"></script>
+<script src="js/data/artifacts.js"></script>
+<script src="js/data/trophystore.js"></script>
+<script src="js/data/unlocks.js"></script>
+<script src="js/data/xpshop.js"></script>
+<script src="js/state.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/fields.js"></script>
+<script src="js/tabs.js"></script>
+<script src="js/powers.js"></script>
+<script src="js/insta.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/maps-medals.js"></script>
+<script src="js/artifacts.js"></script>
+<script src="js/trophystore.js"></script>
+<script src="js/unlocks.js"></script>
+<script src="js/rogue.js"></script>
+<script src="js/frontier.js"></script>
+<script src="js/mapsaves.js"></script>
+<script src="js/profilestats.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
