@@ -60,7 +60,7 @@ function msTowerFootprint(t) {
   }
 }
 
-function msToCanvas(t) { return { x:(t.position.x+150)*10, y:(t.position.y+116)*10 }; }
+function msToCanvas(t) { return { x:(t.position.x+150)*10, y:(-t.position.y+116)*10 }; }
 
 function msIsRect(t) { return t.baseId==='MonkeyAce'||t.baseId==='BananaFarm'||t.baseId==='HeliPilot'; }
 
@@ -283,14 +283,14 @@ function msCanvasThing(event) {
   const rect = msCanvas.getBoundingClientRect();
   const clickX = event.clientX - rect.left;
   const clickY = event.clientY - rect.top;
-  const gameX = (((3000 / rect.width)  * clickX) / 10) - 150;
-  const gameY = (((2320 / rect.height) * clickY) / 10) - 116;
+  const gameX =  (((3000 / rect.width)  * clickX) / 10) - 150;
+  const gameY = -(((2320 / rect.height) * clickY) / 10) + 116;
 
   const towers = (profile.savedMaps?.[msSelectedMap]?.placedTowers??[])
     .filter(t => t.parentTowerId === 4294967295);
 
-  const cx = (gameX + 150) * 10;
-  const cy = (gameY + 116) * 10;
+  const cx = ( gameX + 150) * 10;
+  const cy = (-gameY + 116) * 10;
 
   let best=null, bestDist=Infinity;
   for (const t of towers) {
