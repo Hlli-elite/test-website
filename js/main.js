@@ -1,3 +1,5 @@
+document.getElementById('versionDisplay').textContent = `v${EDITOR_VERSION}`;
+
 function setStatus(type, msg) {
   const el = document.getElementById('status');
   el.className = type; el.textContent = msg;
@@ -82,12 +84,8 @@ zone.addEventListener('drop', e => {
   if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('versionDisplay').textContent = `v${EDITOR_VERSION}`;
-
-  const si = document.getElementById('trophySearch');
-  if (si) si.addEventListener('input', () => {
-    trophySearchTerm = si.value;
-    filterTrophyCards();
-  });
+const si = document.getElementById('trophySearch');
+if (si) si.addEventListener('input', () => {
+  trophySearchTerm = si.value;
+  filterTrophyCards();
 });
