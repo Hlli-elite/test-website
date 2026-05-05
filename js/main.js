@@ -83,6 +83,8 @@ zone.addEventListener('drop', e => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('versionDisplay').textContent = `v${EDITOR_VERSION}`;
+
   const si = document.getElementById('trophySearch');
   if (si) si.addEventListener('input', () => {
     trophySearchTerm = si.value;
