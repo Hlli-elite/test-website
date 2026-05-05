@@ -12,11 +12,6 @@ async function getMapJson(technicalName) {
 
 function msDrawMapBackground(mapJson) {
   if (!msCtx || !mapJson) return;
-
-  msCtx.save();
-  msCtx.translate(0, 2320);
-  msCtx.scale(1, -1);
-
   for (const area of (mapJson.areas ?? [])) {
     const pts = area.polygon?.points;
     if (!pts?.length) continue;
@@ -45,8 +40,6 @@ function msDrawMapBackground(mapJson) {
     }
     msCtx.stroke();
   }
-
-  msCtx.restore();
 }
 
 const MS_PI2 = Math.PI * 2;
@@ -67,7 +60,12 @@ function msTowerFootprint(t) {
   }
 }
 
-function msToCanvas(t) { return { x:(t.position.x+150)*10, y:(t.position.y+116)*10 }; }
+function msToCanvas(t) {
+  return {
+    x: (t.position.x + 150) * 10,
+    y: (t.position.y + 116) * 10
+  };
+}
 
 function msIsRect(t) { return t.baseId==='MonkeyAce'||t.baseId==='BananaFarm'||t.baseId==='HeliPilot'; }
 
@@ -164,10 +162,6 @@ function msDrawCanvas() {
   const towers = (profile.savedMaps?.[msSelectedMap]?.placedTowers ?? [])
     .filter(t => t.parentTowerId === 4294967295);
 
-  msCtx.save();
-  msCtx.translate(0, 2320);
-  msCtx.scale(1, -1);
-
   msCtx.fillStyle  = '#00ff00';
   msCtx.globalAlpha = 0.5;
   msCtx.font = '48px serif';
@@ -198,8 +192,6 @@ function msDrawCanvas() {
     else { msCtx.moveTo(x+r,y); msCtx.arc(x,y,r,0,MS_PI2); }
     msCtx.stroke(); msCtx.fill();
   }
-
-  msCtx.restore();
 
   msCtx.globalAlpha = 1;
   msCtx.fillStyle  = '#ffffff';
@@ -294,14 +286,12 @@ function msCanvasThing(event) {
   const rect = msCanvas.getBoundingClientRect();
   const clickX = event.clientX - rect.left;
   const clickY = event.clientY - rect.top;
-  const gameX = (((3000 / rect.width)  * clickX) / 10) - 150;
-  const gameY = (((2320 / rect.height) * clickY) / 10) - 116;
+
+  const cx = (3000 / rect.width)  * clickX;
+  const cy = (2320 / rect.height) * clickY;
 
   const towers = (profile.savedMaps?.[msSelectedMap]?.placedTowers??[])
     .filter(t => t.parentTowerId === 4294967295);
-
-  const cx = (gameX + 150) * 10;
-  const cy = (gameY + 116) * 10;
 
   let best=null, bestDist=Infinity;
   for (const t of towers) {
