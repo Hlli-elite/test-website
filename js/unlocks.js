@@ -1,116 +1,111 @@
-const UNLOCKS = [
-  // ── DLC / Pure IAP (owned or not, no active state) ───────────────
-  {
-    type: 'dlc', name: 'Legends: Rogue Mode', iapKey: 'btd6_legendsrogue',
-    desc: 'Grants ownership of the Rogue DLC game mode.',
-    extraApply: (p, on) => { if (on) p.hasPlayedPurchasedFrontier = true; }
-  },
-  {
-    type: 'dlc', name: 'Legends: Frontier Mode', iapKey: 'btd6_legendsfrontier',
-    desc: 'Grants ownership of the Frontier DLC game mode.',
-    extraApply: null
-  },
-  {
-    type: 'dlc', name: 'Beast Handler Tower', iapKey: 'btd6_beast',
-    desc: 'Grants ownership of the Beast Handler tower DLC.',
-    extraApply: (p, on) => {
-      if (!p.unlockedTowers) p.unlockedTowers = [];
-      if (on && !p.unlockedTowers.includes('BeastHandler'))
-        p.unlockedTowers.push('BeastHandler');
-    }
-  },
-  {
-    type: 'dlc', name: 'Map Editor', iapKey: 'btd6_mapeditorsupporter_new',
-    desc: 'Grants ownership of the Map Editor.',
-    extraApply: (p, on) => {
-      p.hasUnlockedMapEditor = on;
-      if (on) p.seenMapEditorInfoPopup = true;
-    }
-  },
+function toggleIap(p, item, on) {
+  if (!p.purchase) p.purchase = {};
+  if (!p.purchase.purchasedOneTimeItems) p.purchase.purchasedOneTimeItems = [];
+  const arr = p.purchase.purchasedOneTimeItems;
+  const idx = arr.indexOf(item);
+  if (on && idx === -1) arr.push(item);
+  if (!on && idx !== -1) arr.splice(idx, 1);
+}
 
-  // ── IAP + unlock/active pair ──────────────────────────────────────
-  {
-    type: 'iap', name: 'Double Cash Mode',
-    iapKey: 'btd6_doublecashmode',
-    iapCheck:  p => p.purchase?.purchasedDoubleCashMode === true,
-    iapApply:  (p, on) => { if (!p.purchase) p.purchase = {}; p.purchase.purchasedDoubleCashMode = on; },
-    desc: 'Unlocks Double Cash mode (2× cash from pops).',
-    // Double Cash has no separate "active" toggle in the save — owning it = can use it
-    activeKey: null
-  },
-  {
-    type: 'iap', name: 'Monkey Knowledge',
-    iapKey: 'btd6_knowledgeunlocked',
-    iapCheck: null,
-    iapApply: null,
-    desc: 'Unlocks the Monkey Knowledge system.',
-    activeKey: null,   // active state is just knowledgeDisabled=false
-    unlockedKey: null,
-    // handled via extraApply
-    extraUnlockApply: (p, on) => {
-      toggleIap(p, 'btd6_knowledgeunlocked', on);
-      p.knowledgeDisabled = !on;
-      if (on) p.newKnowledgePoints = true;
-    },
-    extraActiveApply: (p, on) => { p.knowledgeDisabled = !on; },
-    checkUnlocked: p => (p.purchase?.purchasedOneTimeItems || []).includes('btd6_knowledgeunlocked'),
-    checkActive:   p => p.knowledgeDisabled === false
-  },
+function makeCheckLabel(labelText, checked, onChange) {
+  const wrap = document.createElement('label');
+  wrap.style.cssText = 'display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:#888;white-space:nowrap;';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = checked;
+  cb.dataset.label = labelText;
+  cb.style.accentColor = '#f0c040';
+  cb.addEventListener('change', () => onChange(cb.checked));
+  wrap.appendChild(cb);
+  wrap.appendChild(document.createTextNode(labelText));
+  return wrap;
+}
 
-  // ── Simple toggle (unlocked + active booleans) ────────────────────
-  {
-    type: 'toggle', name: 'Fast Track',
-    unlockedKey: 'unlockedFastTrack', activeKey: 'fastTrackActive',
-    seenKey: 'seenFastTrack',
-    desc: 'Lets you speed up games in progress.'
-  },
-  {
-    type: 'toggle', name: 'Big Bloons',
-    unlockedKey: 'unlockedBigBloons', activeKey: 'bigBloonsActive',
-    seenKey: 'seenBigBloons',
-    desc: 'Visual modifier — bloons appear larger.'
-  },
-  {
-    type: 'toggle', name: 'Small Bloons',
-    unlockedKey: 'unlockedSmallBloons', activeKey: 'smallBloonsActive',
-    seenKey: 'seenSmallBloons',
-    desc: 'Visual modifier — bloons appear smaller.'
-  },
-  {
-    type: 'toggle', name: 'Big Towers',
-    unlockedKey: 'unlockedBigTowers', activeKey: 'bigTowersActive',
-    seenKey: 'seenBigTowers',
-    desc: 'Visual modifier — towers appear larger.'
-  },
-  {
-    type: 'toggle', name: 'Small Towers',
-    unlockedKey: 'unlockedSmallTowers', activeKey: 'smallTowersActive',
-    seenKey: 'seenSmallTowers',
-    desc: 'Visual modifier — towers appear smaller.'
-  },
-  {
-    type: 'toggle', name: 'Small Bosses',
-    unlockedKey: 'unlockedSmallBosses', activeKey: 'smallBossesActive',
-    seenKey: 'seenSmallBosses',
-    desc: 'Visual modifier — boss bloons appear smaller.'
-  },
-  {
-    type: 'toggle', name: 'Perks',
-    unlockedKey: null, activeKey: 'perksToggledOn',
-    seenKey: null,
-    desc: 'Enables the perks system for hero abilities.'
-  },
-  {
-    type: 'toggle', name: 'Oompa Loompa Easter Egg',
-    unlockedKey: 'unlockedBigBloons',  // reuses big bloons gate in-game
-    activeKey: 'oompaLoompad',
-    seenKey: null,
-    desc: 'Activates the hidden Oompa Loompa easter egg skin flag.'
-  },
-  {
-    type: 'toggle', name: 'Colour Blind Mode',
-    unlockedKey: null, activeKey: 'colorBlindModeOn',
-    seenKey: null,
-    desc: 'Enables the colour blind accessibility setting.'
-  },
-];
+function syncCb(row, labelText, value) {
+  row.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    if (cb.dataset.label === labelText) cb.checked = value;
+  });
+}
+
+function buildUnlocks() {
+  const grid = document.getElementById('unlockGrid');
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+
+  for (const u of UNLOCKS) {
+    const row = document.createElement('div');
+    row.className = 'unlock-row' + (u.type === 'dlc' || u.type === 'iap' ? ' iap' : '');
+
+    const info = document.createElement('div');
+    info.className = 'unlock-info';
+    info.innerHTML = `<div class="unlock-name">${u.name}</div><div class="unlock-desc">${u.desc}</div>`;
+
+    const controls = document.createElement('div');
+    controls.style.cssText = 'display:flex;flex-direction:column;gap:4px;flex-shrink:0;';
+
+    if (u.type === 'dlc') {
+      const owned = (profile.purchase?.purchasedOneTimeItems || []).includes(u.iapKey);
+      const label = makeCheckLabel('Owned', owned, on => {
+        toggleIap(profile, u.iapKey, on);
+        if (u.extraApply) u.extraApply(profile, on);
+        row.classList.toggle('active', on);
+      });
+      if (owned) row.classList.add('active');
+      controls.appendChild(label);
+
+    } else if (u.type === 'iap') {
+      const isUnlocked = u.checkUnlocked ? u.checkUnlocked(profile)
+        : (profile.purchase?.purchasedOneTimeItems || []).includes(u.iapKey);
+      const isActive = u.checkActive ? u.checkActive(profile)
+        : (u.activeKey ? profile[u.activeKey] === true : isUnlocked);
+
+      const lU = makeCheckLabel('Unlocked', isUnlocked, on => {
+        if (u.extraUnlockApply) u.extraUnlockApply(profile, on);
+        else { toggleIap(profile, u.iapKey, on); if (u.iapApply) u.iapApply(profile, on); }
+        row.classList.toggle('active', on);
+      });
+      controls.appendChild(lU);
+
+      if (u.activeKey || u.checkActive) {
+        const lA = makeCheckLabel('Active', isActive, on => {
+          if (u.extraActiveApply) u.extraActiveApply(profile, on);
+          else if (u.activeKey) profile[u.activeKey] = on;
+        });
+        controls.appendChild(lA);
+      }
+
+      if (isUnlocked) row.classList.add('active');
+
+    } else {
+      const isUnlocked = u.unlockedKey ? profile[u.unlockedKey] === true : true;
+      const isActive   = u.activeKey   ? profile[u.activeKey]   === true : false;
+
+      if (u.unlockedKey) {
+        const lU = makeCheckLabel('Unlocked', isUnlocked, on => {
+          profile[u.unlockedKey] = on;
+          if (u.seenKey) profile[u.seenKey] = on;
+          if (!on && u.activeKey) { profile[u.activeKey] = false; syncCb(row, 'Active', false); }
+          row.classList.toggle('active', on || (u.activeKey && profile[u.activeKey]));
+        });
+        controls.appendChild(lU);
+      }
+
+      if (u.activeKey) {
+        const lA = makeCheckLabel('Active', isActive, on => {
+          profile[u.activeKey] = on;
+          if (on && u.unlockedKey) { profile[u.unlockedKey] = true; if (u.seenKey) profile[u.seenKey] = true; syncCb(row, 'Unlocked', true); }
+          row.classList.toggle('active', on);
+        });
+        controls.appendChild(lA);
+      }
+
+      if (isUnlocked || isActive) row.classList.add('active');
+    }
+
+    row.appendChild(info);
+    row.appendChild(controls);
+    frag.appendChild(row);
+  }
+
+  grid.appendChild(frag);
+}
