@@ -1,1 +1,1 @@
-const EDITOR_VERSION = '1.54.5.14';
+const EDITOR_VERSION = '1.54.6.15';
