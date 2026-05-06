@@ -43,15 +43,24 @@ function flushHeavy(tab) {
     document.getElementById('achGrid').innerHTML = '';
   }
   if (tab === 'maps') {
-    document.querySelectorAll('#mapsBody input').forEach(inp => {
-      const m = inp.dataset.map, d = inp.dataset.diff, k = inp.dataset.mode;
-      if (!m) return;
-      if (!profile.mapInfo) profile.mapInfo = {};
-      if (!profile.mapInfo.maps) profile.mapInfo.maps = {};
-      if (!profile.mapInfo.maps[m]) profile.mapInfo.maps[m] = {};
-      if (!profile.mapInfo.maps[m].difficult) profile.mapInfo.maps[m].difficult = {};
-      if (!profile.mapInfo.maps[m].difficult[d]) profile.mapInfo.maps[m].difficult[d] = {};
-      profile.mapInfo.maps[m].difficult[d][k] = parseInt(inp.value) || 0;
+  document.querySelectorAll('#mapsBody input').forEach(inp => {
+    const m = inp.dataset.map, d = inp.dataset.diff, k = inp.dataset.mode;
+    if (!m) return;
+    if (!profile.mapInfo) profile.mapInfo = {};
+    if (!profile.mapInfo.maps) profile.mapInfo.maps = {};
+    if (!profile.mapInfo.maps[m]) profile.mapInfo.maps[m] = {};
+    if (!profile.mapInfo.maps[m].difficult) profile.mapInfo.maps[m].difficult = {};
+    if (!profile.mapInfo.maps[m].difficult[d]) profile.mapInfo.maps[m].difficult[d] = {};
+    if (!profile.mapInfo.maps[m].difficult[d].modes) profile.mapInfo.maps[m].difficult[d].modes = {};
+    const newVal = parseInt(inp.value) || 0;
+    if (newVal === 0) {
+      delete profile.mapInfo.maps[m].difficult[d].modes[k];
+    } else {
+      profile.mapInfo.maps[m].difficult[d].modes[k] = medalToEncoded(newVal);
+    }
+  });
+  document.getElementById('mapsBody').innerHTML = '';
+}
     });
     document.getElementById('mapsBody').innerHTML = '';
   }
